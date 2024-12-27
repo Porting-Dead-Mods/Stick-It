@@ -3,9 +3,9 @@ package com.portingdeadmods.plonk.common.item;
 import com.portingdeadmods.plonk.common.config.PlonkConfig;
 import com.portingdeadmods.plonk.common.registry.RegistryBlocks;
 import com.portingdeadmods.plonk.common.tile.TilePlacedItems;
+import com.portingdeadmods.plonk.data.DataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -19,37 +19,29 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class ItemBlockPlacedItems extends BlockItem {
-    private static final String TAG_HELD = "Held";
-    private static final String TAG_RENDER_TYPE = TilePlacedItems.TAG_RENDER_TYPE;
 
     public ItemBlockPlacedItems(Item.Properties builder) {
         super(RegistryBlocks.placed_items, builder);
     }
 
     public void setHeldStack(ItemStack stack, ItemStack held, int renderType) {
-        CompoundTag tagCompound = stack.getOrCreateTag();
-
-        CompoundTag tagCompoundHeld = tagCompound.getCompound(TAG_HELD);
-        held.save(tagCompoundHeld);
-        tagCompound.put(TAG_HELD, tagCompoundHeld);
-
-        tagCompound.putInt(TAG_RENDER_TYPE, renderType);
-
-        stack.setTag(tagCompound);
+        stack.set(DataComponents.HELD, true);
+        stack.set(DataComponents.RENDER_TYPE, renderType);
     }
 
     public ItemStack getHeldStack(ItemStack stack) {
-        CompoundTag tagCompound = stack.getTag();
-        if (tagCompound == null || !tagCompound.contains(TAG_HELD))
+        if (!stack.has(DataComponents.HELD))
             return ItemStack.EMPTY;
-        return ItemStack.of(tagCompound.getCompound(TAG_HELD));
+
+        ItemStack held = new ItemStack(stack.getItem());
+        held.set(DataComponents.HELD,stack.get(DataComponents.HELD));
+        return held;
     }
 
     public int getHeldRenderType(ItemStack stack) {
-        CompoundTag tagCompound = stack.getTag();
-        if (tagCompound == null || !tagCompound.contains(TAG_RENDER_TYPE))
+        if (!stack.has(DataComponents.RENDER_TYPE))
             return 0;
-        return tagCompound.getInt(TAG_RENDER_TYPE);
+        return stack.get(DataComponents.RENDER_TYPE);
     }
 
     /**

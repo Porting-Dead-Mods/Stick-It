@@ -273,8 +273,8 @@ public class BlockPlacedItems extends BaseEntityBlock implements SimpleWaterlogg
     }
 
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter world, BlockPos pos, Player player) {
-        return WorldUtils.withTile(world, pos, TilePlacedItems.class, tile -> {
+    public ItemStack getCloneItemStack(BlockState state, HitResult target, LevelReader level, BlockPos pos, Player player) {
+        return WorldUtils.withTile(level, pos, TilePlacedItems.class, tile -> {
             int slot = getPickedSlot(tile, pos, player);
             return slot >= 0 ? tile.getItem(slot) : ItemStack.EMPTY;
         }, () -> ItemStack.EMPTY);

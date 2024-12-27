@@ -73,10 +73,7 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
             HEIGHT_ITEM,
             0.75
     );
-    public static final String TAG_VERSION = "Version";
-    public static final String TAG_TILE_ROTATION = "TileRotation";
     public static final int TILE_ROTATION_COUNT = 4;
-    public static final String TAG_ITEM_ROTATION = "ItemRotation";
     public static final String TAG_ITEMS = "Items";
     public static final String TAG_SLOT = "Slot";
     public static final String TAG_RENDER_TYPE = "RenderType";
