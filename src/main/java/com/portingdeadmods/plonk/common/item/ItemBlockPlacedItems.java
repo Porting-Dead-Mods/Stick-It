@@ -25,23 +25,23 @@ public class ItemBlockPlacedItems extends BlockItem {
     }
 
     public void setHeldStack(ItemStack stack, ItemStack held, int renderType) {
-        stack.set(DataComponents.HELD, true);
-        stack.set(DataComponents.RENDER_TYPE, renderType);
+        stack.set(DataComponents.TAG_HELD, true);
+        stack.set(DataComponents.TAG_RENDER_TYPE, renderType);
     }
 
     public ItemStack getHeldStack(ItemStack stack) {
-        if (!stack.has(DataComponents.HELD))
+        if (!stack.has(DataComponents.TAG_HELD))
             return ItemStack.EMPTY;
 
         ItemStack held = new ItemStack(stack.getItem());
-        held.set(DataComponents.HELD,stack.get(DataComponents.HELD));
+        held.set(DataComponents.TAG_HELD,stack.get(DataComponents.TAG_HELD));
         return held;
     }
 
     public int getHeldRenderType(ItemStack stack) {
-        if (!stack.has(DataComponents.RENDER_TYPE))
+        if (!stack.has(DataComponents.TAG_RENDER_TYPE))
             return 0;
-        return stack.get(DataComponents.RENDER_TYPE);
+        return stack.get(DataComponents.TAG_RENDER_TYPE);
     }
 
     /**

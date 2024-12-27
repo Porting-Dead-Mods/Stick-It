@@ -1,5 +1,6 @@
 package com.portingdeadmods.plonk.common.tile;
 
+import com.google.common.collect.ImmutableMap;
 import com.portingdeadmods.plonk.common.block.BlockPlacedItems;
 import com.portingdeadmods.plonk.common.config.PlonkConfig;
 import com.portingdeadmods.plonk.common.registry.RegistryBlocks;
@@ -7,9 +8,9 @@ import com.portingdeadmods.plonk.common.registry.RegistryTileEntities;
 import com.portingdeadmods.plonk.common.util.ItemUtils;
 import com.portingdeadmods.plonk.common.util.bound.Box;
 import com.portingdeadmods.plonk.common.util.bound.BoxCollection;
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -73,7 +74,10 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
             HEIGHT_ITEM,
             0.75
     );
+    public static final String TAG_VERSION = "Version";
+    public static final String TAG_TILE_ROTATION = "TileRotation";
     public static final int TILE_ROTATION_COUNT = 4;
+    public static final String TAG_ITEM_ROTATION = "ItemRotation";
     public static final String TAG_ITEMS = "Items";
     public static final String TAG_SLOT = "Slot";
     public static final String TAG_RENDER_TYPE = "RenderType";
@@ -284,12 +288,9 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
         contentsBoxes = builder.build();
     }
 
-    /**
-     * @see ChestBlockEntity
-     */
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
+    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.loadAdditional(tag, registries);
         TagUpgrader.upgrade(tag);
         this.tileRotation = tag.getInt(TAG_TILE_ROTATION);
         ListTag tagItems = tag.getList(TAG_ITEMS, 10);
@@ -304,7 +305,7 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
             int itemRotation = tagItem.getInt(TAG_ITEM_ROTATION);
 
             if (slot < this.contents.size()) {
-                this.contents.set(slot, ItemStack.of(tagItem));
+                this.contents.set(slot, ItemStack.parseOptional(registries,tagItem));
                 this.contentsMeta[slot] = new ItemMeta(renderType, itemRotation);
             }
         }
@@ -312,9 +313,14 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
         this.needsCleaning = true;
     }
 
+    /**
+     * @see ChestBlockEntity
+     */
+
+
     @Override
-    public void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
+    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+        super.saveAdditional(tag, registries);
         tag.putInt(TAG_VERSION, Tag_VERSION);
         tag.putInt(TAG_TILE_ROTATION, tileRotation);
         ListTag tagItems = new ListTag();
@@ -325,7 +331,8 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
                 tagItem.putByte(TAG_SLOT, (byte) slot);
                 tagItem.putInt(TAG_RENDER_TYPE, this.contentsMeta[slot].renderType);
                 tagItem.putInt(TAG_ITEM_ROTATION, this.contentsMeta[slot].rotation);
-                this.contents.get(slot).save(tagItem);
+                this.contents.get(slot).save(registries);
+                //FIX: i think that's correct
                 tagItems.add(tagItem);
             }
         }
@@ -368,10 +375,11 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
-        return this.saveWithoutMetadata();
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return this.saveWithoutMetadata(registries);
     }
 
+    /*
     @Override
     @OnlyIn(Dist.CLIENT)
     public AABB getRenderBoundingBox() {
@@ -380,6 +388,7 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
         // return this.contentsBoxes.getRenderBoundingBox(this);
         return BlockEntity.INFINITE_EXTENT_AABB;
     }
+     */
 
     @Override
     public int getContainerSize() {

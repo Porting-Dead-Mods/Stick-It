@@ -1,5 +1,6 @@
 package com.portingdeadmods.plonk.common.block;
 
+import com.mojang.serialization.MapCodec;
 import com.portingdeadmods.plonk.common.registry.RegistryTileEntities;
 import com.portingdeadmods.plonk.common.tile.TilePlacedItems;
 import com.portingdeadmods.plonk.common.util.ItemUtils;
@@ -8,12 +9,10 @@ import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.Container;
-import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -70,6 +69,12 @@ public class BlockPlacedItems extends BaseEntityBlock implements SimpleWaterlogg
     public BlockPlacedItems(BlockBehaviour.Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.UP));
+    }
+
+    @Override
+    protected MapCodec<? extends BaseEntityBlock> codec() {
+        //TODO: Implement this
+        return null;
     }
 
     @Nullable
@@ -188,11 +193,11 @@ public class BlockPlacedItems extends BaseEntityBlock implements SimpleWaterlogg
      *
      * @return -1 if no hit otherwise the closest slot
      * @see Entity#pick(double, float, boolean)
-     * @see ForgeMod#BLOCK_REACH
+     * @see Attributes#BLOCK_INTERACTION_RANGE
      */
     protected int getPickedSlot(TilePlacedItems tile, BlockPos pos, Player player) {
         if (picking.get()) return -1;
-        double blockReachDistance = Objects.requireNonNull(player.getAttribute(ForgeMod.BLOCK_REACH.get())).getValue();
+        double blockReachDistance = player.getAttribute(Attributes.BLOCK_INTERACTION_RANGE).getValue();
         float partialTicks = 0.0f;
 
         // Might have issues if player is moving fast or turning their vision fast
@@ -213,16 +218,15 @@ public class BlockPlacedItems extends BaseEntityBlock implements SimpleWaterlogg
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit) {
-        if (worldIn.isClientSide) return InteractionResult.SUCCESS;
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (level.isClientSide) return ItemInteractionResult.SUCCESS;
 
-        TilePlacedItems tile = (TilePlacedItems) worldIn.getBlockEntity(pos);
-        if (tile == null) return InteractionResult.SUCCESS;
+        TilePlacedItems tile = (TilePlacedItems) level.getBlockEntity(pos);
+        if (tile == null) return ItemInteractionResult.SUCCESS;
 
         int slot = getPickedSlot(tile, pos, player);
         if (slot >= 0) {
-            ItemStack stack = tile.getItem(slot);
+            stack = tile.getItem(slot);
             if (!stack.isEmpty()) {
                 //ItemUtils.dropItemWithinBlock(worldId, x, y, z, stack);
                 if (player.isShiftKeyDown()) {
@@ -234,9 +238,9 @@ public class BlockPlacedItems extends BaseEntityBlock implements SimpleWaterlogg
                 tile.setChanged();
                 tile.clean();
             }
-            return InteractionResult.CONSUME;
+            return ItemInteractionResult.CONSUME;
         }
-        return super.use(state, worldIn, pos, player, handIn, hit);
+        return super.useItemOn(stack,state, level, pos, player, hand, hitResult);
     }
 
     @Override
