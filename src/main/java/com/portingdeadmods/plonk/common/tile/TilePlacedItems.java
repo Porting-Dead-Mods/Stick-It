@@ -306,9 +306,10 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
             int slot = tagItem.getByte(TAG_SLOT) & 255;
             int renderType = tagItem.getInt(TAG_RENDER_TYPE);
             int itemRotation = tagItem.getInt(TAG_ITEM_ROTATION);
+            String itemID = tagItem.getString("id");
 
             if (slot < this.contents.size()) {
-                this.contents.set(slot, ItemStack.parseOptional(registries,tagItem));
+                this.contents.set(slot, ItemStack.parseOptional(registries, tagItem));
                 this.contentsMeta[slot] = new ItemMeta(renderType, itemRotation);
             }
         }
@@ -334,8 +335,8 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
                 tagItem.putByte(TAG_SLOT, (byte) slot);
                 tagItem.putInt(TAG_RENDER_TYPE, this.contentsMeta[slot].renderType);
                 tagItem.putInt(TAG_ITEM_ROTATION, this.contentsMeta[slot].rotation);
-                //TODO: this.contents.get(slot).save(tagItem);
-                this.contents.get(slot).save(registries,tagItem);
+                tagItem.putString("id", this.contents.get(slot).getItem().toString());
+                this.contents.get(slot).save(registries, tagItem);
                 tagItems.add(tagItem);
             }
         }
