@@ -334,8 +334,8 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
                 tagItem.putByte(TAG_SLOT, (byte) slot);
                 tagItem.putInt(TAG_RENDER_TYPE, this.contentsMeta[slot].renderType);
                 tagItem.putInt(TAG_ITEM_ROTATION, this.contentsMeta[slot].rotation);
-                this.contents.get(slot).save(registries);
-                //FIX: i think that's correct
+                //TODO: this.contents.get(slot).save(tagItem);
+                this.contents.get(slot).save(registries,tagItem);
                 tagItems.add(tagItem);
             }
         }

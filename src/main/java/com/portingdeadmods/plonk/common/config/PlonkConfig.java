@@ -1,75 +1,69 @@
 package com.portingdeadmods.plonk.common.config;
 
+import com.portingdeadmods.plonk.Plonk;
 import com.portingdeadmods.plonk.common.tag.PlonkTags;
 import com.portingdeadmods.plonk.common.util.ItemUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.fml.config.IConfigSpec;
-import net.neoforged.fml.config.ModConfig;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@EventBusSubscriber(modid = Plonk.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class PlonkConfig {
-    public static final ModConfigSpec serverSpec;
-    private static final Server SERVER;
+    public static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
+    public static final ModConfigSpec SPEC;
+
+    public static final ModConfigSpec.IntValue MAX_STACK_SIZE;
+    private static final ModConfigSpec.ConfigValue<List<? extends String>> UNPLACEABLE_ITEMS;
+    private static Set<ResourceLocation> unplaceableItemsSet = Collections.emptySet();
 
     static {
-        final Pair<Server, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(Server::new);
-        serverSpec = specPair.getRight();
-        SERVER = specPair.getLeft();
+        BUILDER.comment("Plonk Configuration");
+
+        MAX_STACK_SIZE = BUILDER
+                .comment("Max stack size per slot (-1 or 0 to use default). Going above 64 needs a mod like StackUp!.")
+                .defineInRange("maxStackSize", -1, -1, Integer.MAX_VALUE);
+
+        UNPLACEABLE_ITEMS = BUILDER
+                .comment("Items that cannot be placed down, in the format \"mod_id:item_id\" e.g. [\"minecraft:carrot\"]",
+                        "You can also use the " + PlonkTags.Items.UNPLACEABLE.location() + " item tag as well.")
+                .defineList("unplaceableItems", Collections.emptyList(),
+                        o -> o instanceof String && ResourceLocation.tryParse((String) o) != null);
+
+        SPEC = BUILDER.build();
     }
 
-    /**
-     * Gets the maximum stack size for placed items.
-     */
     public static int getInventoryStackLimit() {
-        int maxStackSize = SERVER.maxStackSize.get();
+        int maxStackSize = MAX_STACK_SIZE.get();
         return maxStackSize <= 0 ? ItemUtils.getMaxStackSize() : maxStackSize;
     }
 
-    /**
-     * Checks if the given stack can be placed down.
-     */
     public static boolean canPlace(ItemStack stack) {
         if (stack.is(PlonkTags.Items.UNPLACEABLE))
             return false;
-        return !PlonkConfig.SERVER.unplaceableItemsSet.contains(ItemUtils.getIdentifier(stack));
+        return !unplaceableItemsSet.contains(ItemUtils.getIdentifier(stack));
     }
 
-    public static void refresh(ModConfigEvent event) {
-        ModConfig modConfig = event.getConfig();
-        IConfigSpec spec = modConfig.getSpec();
-        if (spec == serverSpec) {
-            SERVER.refresh();
-        }
+    @SubscribeEvent
+    public static void onLoad(final ModConfigEvent.Loading event) {
+        refreshConfig();
     }
 
-    private static class Server {
-        public final ModConfigSpec.IntValue maxStackSize;
-        private final ModConfigSpec.ConfigValue<List<? extends String>> unplaceableItems;
-        public Set<ResourceLocation> unplaceableItemsSet = Collections.emptySet();
+    @SubscribeEvent
+    public static void onReload(final ModConfigEvent.Reloading event) {
+        refreshConfig();
+    }
 
-        Server(ModConfigSpec.Builder builder) {
-            maxStackSize = builder
-                    .comment("Max stack size per slot (-1 or 0 to use default). Going above 64 needs a mod like StackUp!.")
-                    .defineInRange("maxStackSize", -1, -1, Integer.MAX_VALUE);
-            unplaceableItems = builder
-                    .comment("Items that cannot be placed down, in the format \"mod_id:item_id\" e.g. [\"minecraft:carrot\"]",
-                            "You can also use the " + PlonkTags.Items.UNPLACEABLE.location() + " item tag as well.")
-                    .defineList("unplaceableItems", Collections.emptyList(),
-                            o -> o instanceof String && ResourceLocation.tryParse((String) o) != null);
-        }
-
-        public void refresh() {
-            unplaceableItemsSet = unplaceableItems.get().stream()
-                    .map(ResourceLocation::tryParse)
-                    .collect(Collectors.toSet());
-        }
+    private static void refreshConfig() {
+        unplaceableItemsSet = UNPLACEABLE_ITEMS.get().stream()
+                .map(ResourceLocation::tryParse)
+                .collect(Collectors.toSet());
     }
 }

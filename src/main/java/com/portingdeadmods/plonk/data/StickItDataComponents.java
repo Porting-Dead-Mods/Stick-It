@@ -12,10 +12,10 @@ public class StickItDataComponents {
 
     public static final DeferredRegister.DataComponents COMPONENTS = DeferredRegister.createDataComponents(Plonk.MOD_ID);
 
-    public static final Supplier<DataComponentType<Boolean>> TAG_HELD = COMPONENTS.registerComponentType("Held",
+    public static final Supplier<DataComponentType<Boolean>> TAG_HELD = COMPONENTS.registerComponentType("held",
             builder -> builder.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
 
-    public static final Supplier<DataComponentType<Integer>> TAG_RENDER_TYPE = COMPONENTS.registerComponentType("RenderType",
+    public static final Supplier<DataComponentType<Integer>> TAG_RENDER_TYPE = COMPONENTS.registerComponentType("render_type",
             builder -> builder.persistent(Codec.INT).networkSynchronized(ByteBufCodecs.INT));
 
 

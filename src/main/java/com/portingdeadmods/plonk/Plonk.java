@@ -6,6 +6,7 @@ import com.portingdeadmods.plonk.common.registry.RegistryBlocks;
 import com.portingdeadmods.plonk.common.registry.RegistryItems;
 import com.portingdeadmods.plonk.common.registry.RegistryTileEntities;
 import com.portingdeadmods.plonk.common.tag.PlonkTags;
+import com.portingdeadmods.plonk.data.StickItDataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -23,15 +24,14 @@ public class Plonk {
     public static final String CARRY_ON_MOD_ID = "carryon";
 
     public Plonk(IEventBus modEventBus, ModContainer modContainer) {
-
+        StickItDataComponents.COMPONENTS.register(modEventBus);
         modEventBus.addListener(this::onRegister);
-        modEventBus.addListener(PlonkConfig::refresh);
 
         if (FMLEnvironment.dist.isClient()) {
             ClientEvents.init(modEventBus);
         }
 
-        modContainer.registerConfig(ModConfig.Type.SERVER, PlonkConfig.serverSpec);
+        modContainer.registerConfig(ModConfig.Type.SERVER, PlonkConfig.SPEC);
         PlonkTags.init();
     }
 
