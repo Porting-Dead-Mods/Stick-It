@@ -2,20 +2,15 @@ package com.portingdeadmods.plonk.data;
 
 import com.portingdeadmods.plonk.Plonk;
 import com.portingdeadmods.plonk.common.registry.RegistryBlocks;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
-import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
+import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
 import javax.annotation.Nonnull;
-import java.util.function.Function;
 
 import static com.portingdeadmods.plonk.data.DataGenUtils.minecraft;
 import static com.portingdeadmods.plonk.data.DataGenUtils.plonk;
@@ -25,9 +20,6 @@ public class BlockStates extends BlockStateProvider {
         super(output, Plonk.MOD_ID, existingFileHelper);
     }
 
-    /**
-     * @see BlockStateProvider#directionalBlock(Block, Function, int)
-     */
     @Override
     protected void registerStatesAndModels() {
         final BlockModelBuilder placed_items_model = models().withExistingParent("placed_items", minecraft("block/block"))
@@ -59,13 +51,4 @@ public class BlockStates extends BlockStateProvider {
         return Plonk.NAME + " Block States";
     }
 
-    @Override
-    protected BlockStateProviderType<?> type() {
-        return null;
-    }
-
-    @Override
-    public BlockState getState(RandomSource random, BlockPos pos) {
-        return null;
-    }
 }

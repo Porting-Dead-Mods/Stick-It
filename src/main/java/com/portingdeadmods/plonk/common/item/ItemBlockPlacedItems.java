@@ -3,15 +3,18 @@ package com.portingdeadmods.plonk.common.item;
 import com.portingdeadmods.plonk.common.config.PlonkConfig;
 import com.portingdeadmods.plonk.common.registry.RegistryBlocks;
 import com.portingdeadmods.plonk.common.tile.TilePlacedItems;
-import com.portingdeadmods.plonk.data.DataComponents;
+import com.portingdeadmods.plonk.data.StickItDataComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -25,23 +28,25 @@ public class ItemBlockPlacedItems extends BlockItem {
     }
 
     public void setHeldStack(ItemStack stack, ItemStack held, int renderType) {
-        stack.set(DataComponents.TAG_HELD, true);
-        stack.set(DataComponents.TAG_RENDER_TYPE, renderType);
+        NonNullList<ItemStack> items = NonNullList.withSize(1, held);
+        ItemContainerContents contents = ItemContainerContents.fromItems(items);
+        stack.set(DataComponents.CONTAINER, contents);
+        stack.set(StickItDataComponents.TAG_RENDER_TYPE, renderType);
     }
 
     public ItemStack getHeldStack(ItemStack stack) {
-        if (!stack.has(DataComponents.TAG_HELD))
+        ItemContainerContents contents = stack.get(DataComponents.CONTAINER);
+        if (contents == null) {
             return ItemStack.EMPTY;
-
-        ItemStack held = new ItemStack(stack.getItem());
-        held.set(DataComponents.TAG_HELD,stack.get(DataComponents.TAG_HELD));
-        return held;
+        }
+        return contents.copyOne();
     }
 
     public int getHeldRenderType(ItemStack stack) {
-        if (!stack.has(DataComponents.TAG_RENDER_TYPE))
+        if (!stack.has(StickItDataComponents.TAG_RENDER_TYPE)) {
             return 0;
-        return stack.get(DataComponents.TAG_RENDER_TYPE);
+        }
+        return stack.get(StickItDataComponents.TAG_RENDER_TYPE).intValue();
     }
 
     /**
