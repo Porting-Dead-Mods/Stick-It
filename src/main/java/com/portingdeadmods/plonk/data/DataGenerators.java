@@ -18,8 +18,12 @@ public class DataGenerators {
         PackOutput output = dataGenerator.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-        dataGenerator.addProvider(event.includeServer(), new BlockStates(output, existingFileHelper));
+
         BlockTags blockTagsProvider = new BlockTags(output, lookupProvider, existingFileHelper);
+        BlockStates blockStatesProvider = new BlockStates(output, existingFileHelper);
+
+        //TODO: Fix why the hell this errors
+        // -> dataGenerator.addProvider(event.includeServer(), blockStatesProvider);
         dataGenerator.addProvider(event.includeServer(), blockTagsProvider);
         dataGenerator.addProvider(event.includeServer(), new ItemTags(output, lookupProvider, blockTagsProvider.contentsGetter(), existingFileHelper));
     }

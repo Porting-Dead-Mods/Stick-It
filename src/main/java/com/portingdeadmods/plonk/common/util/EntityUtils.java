@@ -35,12 +35,13 @@ public class EntityUtils {
      * @see Player#setItemSlot(EquipmentSlot, ItemStack)
      */
     public static void setItemStackToSlotSilent(Player player, EquipmentSlot slotIn, ItemStack stack) {
-        player.verifyEquippedItem(stack);
+        stack.getItem().verifyComponentsAfterLoad(stack);
+
         if (slotIn == EquipmentSlot.MAINHAND) {
             player.getInventory().items.set(player.getInventory().selected, stack);
         } else if (slotIn == EquipmentSlot.OFFHAND) {
             player.getInventory().offhand.set(0, stack);
-        } else if (slotIn.getType() == EquipmentSlot.Type.ARMOR) {
+        } else if (slotIn.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
             player.getInventory().armor.set(slotIn.getIndex(), stack);
         }
     }

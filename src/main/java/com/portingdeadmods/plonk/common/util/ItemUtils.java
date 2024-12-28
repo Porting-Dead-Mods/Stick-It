@@ -1,5 +1,7 @@
 package com.portingdeadmods.plonk.common.util;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.LivingEntity;
@@ -7,7 +9,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -68,7 +69,7 @@ public class ItemUtils {
                 continue;
             }
             ItemStack current = inv.getItem(slot);
-            if (!current.isEmpty() && !ItemStack.isSameItemSameTags(current, remainder)) continue;
+            if (!current.isEmpty() && !ItemStack.isSameItemSameComponents(current, remainder)) continue;
             int toTransfer = Math.min(current.getCount() + remainder.getCount(), stackSizeLimit) - current.getCount();
             if (toTransfer <= 0) continue;
             if (current.isEmpty()) {
@@ -108,7 +109,7 @@ public class ItemUtils {
      */
     @Nullable
     public static ResourceLocation getIdentifier(ItemStack stack) {
-        return ForgeRegistries.ITEMS.getKey(stack.getItem());
+        return BuiltInRegistries.ITEM.getKey(stack.getItem());
     }
 
     public static class InsertStackResult {

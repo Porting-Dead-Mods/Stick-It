@@ -12,10 +12,8 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
@@ -58,7 +56,7 @@ public class CommandDumpRenderTypes implements IPlonkCommand {
         StringBuilder build = new StringBuilder();
         build.append(BuiltInRegistries.ITEM.getKey(stack.getItem()));
 
-        Optional.ofNullable(stack.getTag())
+        Optional.of(stack.getTags())
                 .ifPresent(build::append);
         return build.toString();
     }
@@ -192,6 +190,7 @@ public class CommandDumpRenderTypes implements IPlonkCommand {
     private static class ItemStackRef {
 
         public final ItemStack stack;
+        public final DataComponentMap tagsmap;
 
         public ItemStackRef(Item item) {
             this(new ItemStack(item));
@@ -199,14 +198,15 @@ public class CommandDumpRenderTypes implements IPlonkCommand {
 
         public ItemStackRef(ItemStack stack) {
             this.stack = stack.copy();
+            this.tagsmap = stack.getComponents();
             this.stack.setCount(Math.min(stack.getCount(), 1));
         }
 
         @Override
         public int hashCode() {
             int result = stack.getItem().hashCode();
-            CompoundTag tag = stack.getTag();
-            result = 31 * result + (tag == null ? 7 : tag.hashCode());
+            DataComponentMap tag = stack.getComponents();
+            result = 31 * result + tag.hashCode();
             return result;
         }
 
@@ -215,7 +215,7 @@ public class CommandDumpRenderTypes implements IPlonkCommand {
             if (!(obj instanceof ItemStackRef)) return false;
             ItemStackRef o = (ItemStackRef) obj;
             if (stack.getItem() != o.stack.getItem()) return false;
-            return Objects.equals(stack.getTag(), o.stack.getTag());
+            return ItemStack.isSameItemSameComponents(stack, o.stack);
         }
     }
 }

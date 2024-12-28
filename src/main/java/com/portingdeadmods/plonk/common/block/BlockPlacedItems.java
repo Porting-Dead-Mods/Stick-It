@@ -1,6 +1,7 @@
 package com.portingdeadmods.plonk.common.block;
 
 import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import com.portingdeadmods.plonk.common.registry.RegistryTileEntities;
 import com.portingdeadmods.plonk.common.tile.TilePlacedItems;
 import com.portingdeadmods.plonk.common.util.ItemUtils;
@@ -73,8 +74,7 @@ public class BlockPlacedItems extends BaseEntityBlock implements SimpleWaterlogg
 
     @Override
     protected MapCodec<? extends BaseEntityBlock> codec() {
-        //TODO: Implement this
-        return null;
+        return simpleCodec(BlockPlacedItems::new);
     }
 
     @Nullable
@@ -294,6 +294,7 @@ public class BlockPlacedItems extends BaseEntityBlock implements SimpleWaterlogg
         return true;
     }
 
+    @SuppressWarnings("removal")
     @Override
     public void initializeClient(Consumer<IClientBlockExtensions> consumer) {
         consumer.accept(new IClientBlockExtensions() {

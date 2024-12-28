@@ -4,13 +4,14 @@ import com.portingdeadmods.plonk.Plonk;
 import com.portingdeadmods.plonk.client.command.CommandClientPlonk;
 import com.portingdeadmods.plonk.client.registry.RegistryTESRs;
 import com.portingdeadmods.plonk.client.render.tile.TESRPlacedItems;
-import com.portingdeadmods.plonk.common.packet.PacketPlaceItem;
-import com.portingdeadmods.plonk.common.packet.PacketRotateTile;
+import com.portingdeadmods.plonk.common.networking.PlaceItemPayload;
+import com.portingdeadmods.plonk.common.networking.RotateTilePayload;
 import com.portingdeadmods.plonk.common.registry.RegistryItems;
 import com.portingdeadmods.plonk.common.tile.TilePlacedItems;
 import com.portingdeadmods.plonk.common.util.EntityUtils;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -18,14 +19,20 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientBlockExtensions;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStartingEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.function.Consumer;
 
 import static com.mojang.blaze3d.platform.InputConstants.Type.KEYSYM;
 import static net.neoforged.neoforge.client.settings.KeyConflictContext.IN_GAME;
@@ -50,6 +57,24 @@ public class ClientEvents {
         event.register(ClientEvents.KEY_PLACE);
     }
 
+    /**
+  *  TODO: Switch over to this over:
+  *  {@link com.portingdeadmods.plonk.common.block.BlockPlacedItems#initializeClient(Consumer)}
+  */
+//    public static void onClientExtensions(RegisterClientExtensionsEvent event) {
+//        event.registerBlock(new IClientBlockExtensions() {
+//            @Override
+//            public boolean addHitEffects(BlockState state, Level Level, HitResult target, ParticleEngine manager) {
+//                return true;
+//            }
+//
+//            @Override
+//            public boolean addDestroyEffects(BlockState state, Level world, BlockPos pos, ParticleEngine manager) {
+//                return true;
+//            }
+//        }, );
+//    }
+
     public static void onKeyInput(InputEvent.Key event) {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
@@ -65,7 +90,7 @@ public class ClientEvents {
                         RegistryItems.placed_items.setHeldStack(toPlace, held, renderType);
                         EntityUtils.setHeldItemSilent(player, InteractionHand.MAIN_HAND, toPlace);
                         if (toPlace.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND, hit)).consumesAction()) {
-                            Plonk.CHANNEL.sendToServer(new PacketPlaceItem(hit, renderType));
+                            PacketDistributor.sendToServer(new PlaceItemPayload(hit, renderType));
                             ItemStack newHeld = RegistryItems.placed_items.getHeldStack(toPlace);
                             EntityUtils.setHeldItemSilent(player, InteractionHand.MAIN_HAND, newHeld);
                         } else {
@@ -85,7 +110,7 @@ public class ClientEvents {
         BlockEntity te = world.getBlockEntity(pos);
         if (te instanceof TilePlacedItems) {
             ((TilePlacedItems) te).rotateTile();
-            Plonk.CHANNEL.sendToServer(new PacketRotateTile(pos));
+            PacketDistributor.sendToServer(new RotateTilePayload(pos));
             return true;
         }
         return false;

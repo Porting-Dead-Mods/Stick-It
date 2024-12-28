@@ -2,11 +2,15 @@ package com.portingdeadmods.plonk.data;
 
 import com.portingdeadmods.plonk.Plonk;
 import com.portingdeadmods.plonk.common.registry.RegistryBlocks;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
 import net.neoforged.neoforge.client.model.generators.BlockModelBuilder;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 
@@ -53,5 +57,15 @@ public class BlockStates extends BlockStateProvider {
     @Override
     public String getName() {
         return Plonk.NAME + " Block States";
+    }
+
+    @Override
+    protected BlockStateProviderType<?> type() {
+        return null;
+    }
+
+    @Override
+    public BlockState getState(RandomSource random, BlockPos pos) {
+        return null;
     }
 }
