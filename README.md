@@ -1,25 +1,27 @@
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/e17acf3e-db8d-4050-9fb0-9d01aedbc655" style="display: inline-block; width: 20%; height: 20%;">
+  <div style="display: inline-block; text-align: center;">
+    <strong><h2>Stick It! (Formerly <a href="https://www.curseforge.com/minecraft/mc-mods/plonk">Plonk</a>)</strong>
+    <h3>Special thanks to <a href="https://www.curseforge.com/members/blueagent/projects">BlueAgent</a> for the 1.20.1 code and permission to maintain newer versions of it</h3>
+  </div>
+</div>
 
-Installation information
-=======
+## Features
+- Place any item in the world
+- Rotate placed items using shift-click
+- Multiple items can be placed in the same block space
+- Configurable whitelist/blacklist for placeable items
+- Works with modded items
+- Items retain their NBT data when placed
+## How to Use
+1. Hold any item you want to place
+1. Press P (key can be changed in controls)
+1. Item will be placed on the block you're looking at
+1. Shift + right-click on placed items to rotate them
+1. Right-click on placed items to pick them back up
+ 
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
-
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
-
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
-
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
-
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+## Configuration
+The mod includes server-side configuration options for:
+- Maximum stack size for placed items
+- Blacklist specific items from being placed using item IDs or tags
