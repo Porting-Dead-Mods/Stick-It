@@ -523,13 +523,38 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
      * @return the remaining items if successful, or the original stack if not
      */
     public ItemStack insertStack(ItemStack stack, int renderType) {
-        ItemUtils.InsertStackResult result = ItemUtils.insertStackAdv(this, stack);
-        if (result.remainder != stack) {
-            for (int slot : result.slots) {
-                contentsMeta[slot] = contentsMeta[slot].withRenderType(renderType);
+        if (stack.isEmpty()) return stack;
+
+        ItemStack remainder = stack.copy();
+        int slotsAvailable = 0;
+
+        for (int i = 0; i < getContainerSize(); i++) {
+            if (contents.get(i).isEmpty()) slotsAvailable++;
+        }
+
+        if (slotsAvailable == 0) return stack;
+
+        int totalItems = remainder.getCount();
+        int itemsPerSlot = (int) Math.ceil((double) totalItems / slotsAvailable);
+
+        for (int i = 0; i < getContainerSize() && !remainder.isEmpty(); i++) {
+            if (contents.get(i).isEmpty()) {
+                ItemStack toInsert = remainder.copy();
+                int insertAmount = Math.min(itemsPerSlot, remainder.getCount());
+                toInsert.setCount(insertAmount);
+                contents.set(i, toInsert);
+                contentsMeta[i] = contentsMeta[i].withRenderType(renderType);
+                remainder.shrink(insertAmount);
             }
         }
-        return result.remainder;
+
+        if (!remainder.isEmpty()) {
+            return remainder;
+        }
+
+        needsCleaning = true;
+        this.setChanged();
+        return ItemStack.EMPTY;
     }
 
     public static final class ItemMeta {
