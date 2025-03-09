@@ -292,6 +292,7 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         TagUpgrader.upgrade(tag);
+        migrateOldFormat(tag,registries);
         this.tileRotation = tag.getInt(TAG_TILE_ROTATION);
         ListTag tagItems = tag.getList(TAG_ITEMS, CompoundTag.TAG_COMPOUND);
         this.contents = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
@@ -337,6 +338,59 @@ public class TilePlacedItems extends BlockEntity implements WorldlyContainer {
         }
 
         tag.put(TAG_ITEMS, tagItems);
+    }
+
+    public static void migrateOldFormat(CompoundTag tag, HolderLookup.Provider registries) {
+        if (tag.contains(TAG_ITEMS)) {
+            ListTag oldTagItems = tag.getList(TAG_ITEMS, CompoundTag.TAG_COMPOUND);
+            ListTag newTagItems = new ListTag();
+
+            for (int i = 0; i < oldTagItems.size(); i++) {
+                CompoundTag oldTagItem = oldTagItems.getCompound(i);
+
+                if (!oldTagItem.contains("item")) {
+                    CompoundTag newTagItem = new CompoundTag();
+
+                    newTagItem.putByte(TAG_SLOT, oldTagItem.getByte(TAG_SLOT));
+                    if (oldTagItem.contains(TAG_RENDER_TYPE))
+                        newTagItem.putInt(TAG_RENDER_TYPE, oldTagItem.getInt(TAG_RENDER_TYPE));
+                    if (oldTagItem.contains(TAG_ITEM_ROTATION))
+                        newTagItem.putInt(TAG_ITEM_ROTATION, oldTagItem.getInt(TAG_ITEM_ROTATION));
+
+                    CompoundTag itemTag = new CompoundTag();
+
+                    for (String key : oldTagItem.getAllKeys()) {
+                        if (!key.equals(TAG_SLOT) && !key.equals(TAG_RENDER_TYPE) && !key.equals(TAG_ITEM_ROTATION)) {
+                            if (oldTagItem.contains(key, CompoundTag.TAG_COMPOUND)) {
+                                itemTag.put(key, oldTagItem.getCompound(key).copy());
+                            } else if (oldTagItem.contains(key, CompoundTag.TAG_LIST)) {
+                                itemTag.put(key, oldTagItem.getList(key, CompoundTag.TAG_COMPOUND).copy());
+                            } else {
+                                switch (oldTagItem.getTagType(key)) {
+                                    case CompoundTag.TAG_BYTE -> itemTag.putByte(key, oldTagItem.getByte(key));
+                                    case CompoundTag.TAG_SHORT -> itemTag.putShort(key, oldTagItem.getShort(key));
+                                    case CompoundTag.TAG_INT -> itemTag.putInt(key, oldTagItem.getInt(key));
+                                    case CompoundTag.TAG_LONG -> itemTag.putLong(key, oldTagItem.getLong(key));
+                                    case CompoundTag.TAG_FLOAT -> itemTag.putFloat(key, oldTagItem.getFloat(key));
+                                    case CompoundTag.TAG_DOUBLE -> itemTag.putDouble(key, oldTagItem.getDouble(key));
+                                    case CompoundTag.TAG_STRING -> itemTag.putString(key, oldTagItem.getString(key));
+                                    case CompoundTag.TAG_BYTE_ARRAY -> itemTag.putByteArray(key, oldTagItem.getByteArray(key));
+                                    case CompoundTag.TAG_INT_ARRAY -> itemTag.putIntArray(key, oldTagItem.getIntArray(key));
+                                    case CompoundTag.TAG_LONG_ARRAY -> itemTag.putLongArray(key, oldTagItem.getLongArray(key));
+                                }
+                            }
+                        }
+                    }
+
+                    newTagItem.put("item", itemTag);
+                    newTagItems.add(newTagItem);
+                } else {
+                    newTagItems.add(oldTagItem.copy());
+                }
+            }
+
+            tag.put(TAG_ITEMS, newTagItems);
+        }
     }
 
     public void clientTick() {
