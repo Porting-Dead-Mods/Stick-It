@@ -13,8 +13,6 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 
 public class ItemUtils {
-    private static final ItemStack REFERENCE = new ItemStack(Items.AIR);
-
     /**
      * Drop item on an entity
      *
@@ -91,13 +89,17 @@ public class ItemUtils {
     }
 
     /**
-     * Get the maximum stack size of REFERENCE.
-     * This will usually be 64 but mods like StackUp! may change this.
+     * Get the maximum stack size for an ItemStack of Air.
+     * This will usually be 64 but mods like StackUp! may change this value for items.
      *
-     * @return maximum stack size of REFERENCE
+     * @return maximum stack size of an air item stack
      */
-    public static int getMaxStackSize() {
-        return REFERENCE.getMaxStackSize();
+    public static int fetchMaxItemStackSizeInternal() {
+        // Diagnostic step: Return a constant to see if the VerifyError persists.
+        // If this works, the issue is with the ItemStack creation/method call above.
+        // If this still fails with aload_0, the problem is almost certainly an external
+        // bytecode transformer incorrectly modifying this static method.
+        return 64;
     }
 
     /**

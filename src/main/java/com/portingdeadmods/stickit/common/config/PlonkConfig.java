@@ -41,8 +41,8 @@ public class PlonkConfig {
     }
 
     public static int getInventoryStackLimit() {
-        int maxStackSize = MAX_STACK_SIZE.get();
-        return maxStackSize <= 0 ? ItemUtils.getMaxStackSize() : maxStackSize;
+        final int maxStackSize = MAX_STACK_SIZE.get();
+        return maxStackSize <= 0 ? ItemUtils.fetchMaxItemStackSizeInternal() : maxStackSize;
     }
 
     public static boolean canPlace(ItemStack stack) {
