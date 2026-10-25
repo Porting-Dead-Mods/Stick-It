@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${version}",
+  "name": "${mod_name}",
+  "description": "${description}",
+  "authors": [
+    "${mod_author}"
+  ],
+  "license": "${license}",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.portingdeadmods.stickit.fabric.StickItFabric"
+    ],
+    "client": [
+      "com.portingdeadmods.stickit.fabric.StickItFabricClient"
+    ]
+  },
+  "accessWidener": "stickit.classtweaker",
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": "*",
+    "baguettelib": ">=2.0.7",
+    "yet_another_config_lib_v3": ">=3.9.7",
+    "minecraft": "~26.3",
+    "java": ">=${java_version}"
+  }
+}

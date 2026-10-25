@@ -1,0 +1,10 @@
+{
+  "block.stickit.placed_items": "Placed Items",
+  "key.category.stickit.main": "Stick It!",
+  "key.stickit.place": "Place Item",
+  "stickit.config.title": "Stick It!",
+  "stickit.config.max_stack_size": "Max Stack Size",
+  "stickit.config.max_stack_size.desc": "Max stack size per slot (-1 or 0 to use default). Going above 64 needs a mod like StackUp!.",
+  "stickit.config.unplaceable_items": "Unplaceable Items",
+  "stickit.config.unplaceable_items.desc": "Items that cannot be placed down, in the format \"mod_id:item_id\" e.g. \"minecraft:carrot\". You can also use the stickit:unplaceable item tag."
+}

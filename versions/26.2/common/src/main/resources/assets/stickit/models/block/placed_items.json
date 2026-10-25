@@ -1,0 +1,17 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "all": "stickit:block/placed_items",
+    "particle": "#all"
+  },
+  "elements": [
+    {
+      "from": [0, -0.01, 0],
+      "to": [16, 0.01, 16],
+      "faces": {
+        "up": { "texture": "#all" },
+        "down": { "texture": "#all", "uv": [0, 16, 16, 0], "cullface": "down" }
+      }
+    }
+  ]
+}
